@@ -1,7 +1,8 @@
 /* Component-specific styles from firecrawl-marketing */
 
 /* UI Components (for Dashboard v2) */
-@import "./button.css";
+/* Boutons custom désactivés pour laisser le style shadcn/ui natif */
+/* @import "./button.css"; */
 @import "./code.css";
 
 /* Additional component CSS will be added as we migrate more components */

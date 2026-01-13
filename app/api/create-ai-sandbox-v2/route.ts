@@ -16,27 +16,6 @@ export async function POST() {
   try {
     console.log('[create-ai-sandbox-v2] Creating sandbox...');
     
-    // Clean up all existing sandboxes
-    console.log('[create-ai-sandbox-v2] Cleaning up existing sandboxes...');
-    await sandboxManager.terminateAll();
-    
-    // Also clean up legacy global state
-    if (global.activeSandboxProvider) {
-      try {
-        await global.activeSandboxProvider.terminate();
-      } catch (e) {
-        console.error('Failed to terminate legacy global sandbox:', e);
-      }
-      global.activeSandboxProvider = null;
-    }
-    
-    // Clear existing files tracking
-    if (global.existingFiles) {
-      global.existingFiles.clear();
-    } else {
-      global.existingFiles = new Set<string>();
-    }
-
     // Create new sandbox using factory
     const provider = SandboxFactory.create();
     const sandboxInfo = await provider.createSandbox();

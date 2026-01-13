@@ -1,4 +1,4 @@
-# Open Lovable - Vercel Sandbox
+# B-WORK - Vercel Sandbox
 
 This project is configured to use Vercel Sandboxes for code execution.
 

@@ -31,7 +31,7 @@ export const appConfig = {
   // E2B Sandbox Configuration
   e2b: {
     // Sandbox timeout in minutes
-    timeoutMinutes: 30,
+    timeoutMinutes: 60,
 
     // Convert to milliseconds for E2B API
     get timeoutMs() {
@@ -51,7 +51,7 @@ export const appConfig = {
   // AI Model Configuration
   ai: {
     // Default AI model
-    defaultModel: 'google/gemini-3-pro-preview',
+    defaultModel: 'openai/gpt-5',
     
     // Available models
     availableModels: [
