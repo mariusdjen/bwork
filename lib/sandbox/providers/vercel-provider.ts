@@ -1,5 +1,6 @@
 import { Sandbox } from '@vercel/sandbox';
 import { SandboxProvider, SandboxInfo, CommandResult } from '../types';
+import appConfig from '@/config/app.config';
 // SandboxProviderConfig available through parent class
 
 export class VercelProvider extends SandboxProvider {
@@ -7,6 +8,8 @@ export class VercelProvider extends SandboxProvider {
 
   async createSandbox(): Promise<SandboxInfo> {
     try {
+      const devPort = appConfig.vercelSandbox.devPort;
+      const timeoutMs = appConfig.vercelSandbox.timeoutMs;
       
       // Kill existing sandbox if any
       if (this.sandbox) {
@@ -24,9 +27,9 @@ export class VercelProvider extends SandboxProvider {
       // Create Vercel sandbox
       
       const sandboxConfig: any = {
-        timeout: 300000, // 5 minutes in ms
+        timeout: timeoutMs, // from config (default 15 min)
         runtime: 'node22', // Use node22 runtime for Vercel sandboxes
-        ports: [5173] // Vite port
+        ports: [devPort] // Vite/Dev port
       };
 
       // Add authentication based on environment variables
@@ -44,7 +47,7 @@ export class VercelProvider extends SandboxProvider {
       // Sandbox created successfully
       
       // Get the sandbox URL using the correct Vercel Sandbox API
-      const sandboxUrl = this.sandbox.domain(5173);
+      const sandboxUrl = this.sandbox.domain(devPort);
 
       this.sandboxInfo = {
         sandboxId,
@@ -327,6 +330,9 @@ export class VercelProvider extends SandboxProvider {
       throw new Error('No active sandbox');
     }
 
+    const devPort = appConfig.vercelSandbox.devPort;
+    const startupDelay = appConfig.vercelSandbox.devServerStartupDelay || 7000;
+
     // Setting up Vite app for sandbox
     
     // Create directory structure
@@ -355,7 +361,8 @@ export class VercelProvider extends SandboxProvider {
         vite: "^4.3.9",
         tailwindcss: "^3.3.0",
         postcss: "^8.4.31",
-        autoprefixer: "^10.4.16"
+        autoprefixer: "^10.4.16",
+        "tailwindcss-animate": "^1.0.7"
       }
     };
     
@@ -369,7 +376,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: 5173,
+    port: ${devPort},
     strictPort: true,
     allowedHosts: [
       '.vercel.run',  // Allow all Vercel sandbox domains
@@ -388,14 +395,71 @@ export default defineConfig({
     // Create tailwind.config.js
     const tailwindConfig = `/** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ["class"],
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    "./**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))"
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))"
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))"
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))"
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))"
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))"
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))"
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 }`;
     
     await this.writeFile('tailwind.config.js', tailwindConfig);
@@ -463,9 +527,60 @@ export default App`;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background-color: rgb(17 24 39);
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 213 31% 91%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  }
 }`;
     
     await this.writeFile('src/index.css', indexCss);
@@ -531,7 +646,7 @@ body {
     // Vite server started in background
     
     // Wait for Vite to be ready
-    await new Promise(resolve => setTimeout(resolve, 7000));
+    await new Promise(resolve => setTimeout(resolve, startupDelay));
     
     // Track initial files
     this.existingFiles.add('src/App.jsx');

@@ -87,7 +87,7 @@ export function RegisterForm({
 					<div className="flex flex-col items-center gap-1 text-center">
 						<h1 className="text-2xl font-bold">Créez un compte gratuitement</h1>
 						<p className="text-muted-foreground text-sm text-balance">
-							Rejoignez GestiLoc pour simplifier votre gestion locative.
+							Rejoignez B WORK pour simplifier votre gestion locative.
 						</p>
 					</div>
 					<FormField

@@ -28,7 +28,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "B-WORK v1",
+	title: "B-WORK v0",
 	description:
 		"Re-imagine any website in seconds with AI-powered website builder.",
 };

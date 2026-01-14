@@ -7,7 +7,6 @@ import { getUserTools } from "@/actions/tools";
 import { getUserGenerations } from "@/actions/generations";
 import { ToolActions } from "@/components/dashboard/tool-actions";
 import { GenerationPoller } from "@/components/dashboard/generation-poller";
-import { ToolPreview } from "@/components/dashboard/tool-preview";
 
 export default async function UserToolsListPage() {
 	const [{ user, tools }, gens] = await Promise.all([
@@ -139,7 +138,6 @@ export default async function UserToolsListPage() {
 									isPublic={tool.is_public}
 								/>
 
-								<ToolPreview url={tool.sandbox_url} />
 							</div>
 						);
 					})}

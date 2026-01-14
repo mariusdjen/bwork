@@ -6,11 +6,11 @@ import { Suspense } from "react";
 import { ResetPasswordFormSkeleton } from "@/components/skeletons/form-skeletons/reset-password-form-skeleton";
 
 export const metadata: Metadata = {
-	title: "Récupérer votre compte - Gestiloc",
-	description: "Récupérer votre compte et profitez de nos offres Gestiloc",
-	applicationName: "Gestiloc",
+	title: "Récupérer votre compte - B WORK",
+	description: "Récupérer votre compte et profitez de nos offres B WORK",
+	applicationName: "B WORK",
 	creator: "Marius DJENONTIN",
-	keywords: ["gestiloc"],
+	keywords: ["B WORK"],
 };
 
 export default async function RecoverPassword() {
@@ -22,7 +22,7 @@ export default async function RecoverPassword() {
 						<div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
 							<GalleryVerticalEndIcon className="size-4" />
 						</div>
-						Gestiloc.
+						B WORK.
 					</a>
 				</div>
 				<div className="flex flex-1 items-center justify-center">

@@ -81,7 +81,7 @@ export function LoginForm({
 				<div className="flex flex-col items-center gap-1 text-center">
 					<h1 className="text-2xl font-bold">Connexion</h1>
 					<p className="text-muted-foreground text-sm text-balance">
-						Connectez-vous pour accéder à votre compte Gestiloc.
+						Connectez-vous pour accéder à votre compte B WORK.
 					</p>
 				</div>
 

@@ -1,68 +1,68 @@
-'use client';
+"use client";
 
-import {
-	Clock,
-	DoorClosedLocked,
-	SquareActivity,
-	Workflow,
-} from "lucide-react";
+"use client";
+
+import { BellRing, Clock, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import Image from "next/image";
 
 export default function WhyChooseUs() {
 	return (
-		<section className="py-16 md:py-32">
+		<section className="py-16 md:py-28">
 			<div className="mx-auto max-w-6xl px-6">
-				<div className="grid items-center gap-12 md:grid-cols-2 md:gap-12 lg:grid-cols-5 lg:gap-24">
-					<div className="lg:col-span-2">
+				<div className="grid items-center gap-12 md:grid-cols-2 lg:grid-cols-5 lg:gap-20">
+					<div className="lg:col-span-3 space-y-6">
+						<div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+							<ShieldCheck className="h-4 w-4" />
+							B-WORK • Fiable et prêt pour vos équipes
+						</div>
 						<div className="md:pr-6 lg:pr-0">
 							<h2 className="text-4xl font-semibold lg:text-5xl">
-								Gérez mieux, plus vite, sans stress
+								Générez vos outils sans friction
 							</h2>
-							<p className="mt-6">
-								Simplifiez votre quotidien de propriétaire. Tout est centralisé,
-								automatisé et clair plus besoin de jongler entre documents et
-								calculs.
+							<p className="mt-4 text-lg text-muted-foreground">
+								B-WORK crée et déploie vos apps internes en quelques minutes :
+								sandbox prêt, styles shadcn/Tailwind, notifications quand c’est
+								prêt, et un suivi clair des générations.
 							</p>
 						</div>
-						<ul className="mt-8 divide-y border-y *:flex *:items-center *:gap-3 *:py-3">
+						<ul className="mt-4 divide-y border-y *:flex *:items-center *:gap-3 *:py-3">
 							<li>
-								<Clock className="size-5" />
-								Gagnez du temps sur chaque location
+								<Clock className="h-5 w-5 text-primary" />
+								Gagnez du temps : création guidée + anti-doublons
 							</li>
 							<li>
-								<SquareActivity className="size-5" />
-								Suivez vos revenus en un clin d’œil
+								<Workflow className="h-5 w-5 text-primary" />
+								Automatisez la génération et le suivi des sandboxes
 							</li>
 							<li>
-								<Workflow className="size-5" />
-								Automatisez loyers et relances
+								<BellRing className="h-5 w-5 text-primary" />
+								Notifications dès que l’outil est prêt (ou en arrière-plan)
 							</li>
 							<li>
-								<DoorClosedLocked className="size-5" />
-								Gardez tout organisé au même endroit
+								<Sparkles className="h-5 w-5 text-primary" />
+								Design cohérent (shadcn/ui, Tailwind) sans réglages manuels
 							</li>
 						</ul>
 					</div>
-					<div className="border-border/50 relative rounded-3xl border p-3 lg:col-span-3">
-						<div className=" rotate-3 bg-linear-to-b aspect-76/59 relative rounded-2xl from-zinc-300 to-transparent p-px dark:from-zinc-700">
-							<Image
-								src="/images/landing/payement-table-light.png"
-								className="hidden rounded-[15px] dark:block"
-								alt="payments illustration dark"
-								width={1207}
-								height={929}
-							/>
-							<Image
-								src="/images/landing/payement-table-light.png"
-								className="rounded-[15px] shadow dark:hidden"
-								alt="payments illustration light"
-								width={1207}
-								height={929}
-							/>
+					<div className="lg:col-span-2">
+						<div className="relative rounded-3xl border border-border/60 bg-gradient-to-b from-muted/60 to-background p-3 shadow-sm">
+							<div className="relative overflow-hidden rounded-2xl bg-background ring-1 ring-border">
+								<div className="absolute inset-0 bg-gradient-to-br from-[#7699D4]/10 via-transparent to-transparent" />
+								<Image
+									src="/whys.svg"
+									alt="Aperçu B-WORK"
+									width={1200}
+									height={800}
+									className="relative block w-full rounded-2xl"
+									priority
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
+
+		
 	);
 }

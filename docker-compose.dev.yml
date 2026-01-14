@@ -1,0 +1,17 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: open-lovable-dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./:/app
+      - node_modules:/app/node_modules
+    env_file:
+      - .env.local
+    command: pnpm run dev
+
+volumes:
+  node_modules:

@@ -1,0 +1,9 @@
+services:
+  app:
+    build: .
+    container_name: open-lovable
+    restart: unless-stopped
+    env_file:
+      - .env.local
+    ports:
+      - "3001:3001" # le conteneur écoute 3001 (Dockerfile)

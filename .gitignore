@@ -20,6 +20,10 @@
 
 # production
 /build
+/dist
+*.tar
+*.tar.gz
+*.tgz
 
 # misc
 .DS_Store
@@ -34,6 +38,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 .env.local
+.env.production
 !.env.example
 
 # vercel

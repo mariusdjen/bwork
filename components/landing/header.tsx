@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const menuItems = [
 	{ name: "Fonctionnalités", href: "#features" },
 	{ name: "Comment ça marche", href: "#how" },
-	{ name: "Tarifs", href: "/pricing" },
+	{ name: "Tarifs", href: "/#pricing" },
 ];
 export const HeroHeader = () => {
 	const [menuState, setMenuState] = React.useState(false);
@@ -100,9 +100,12 @@ export const HeroHeader = () => {
 								<Button
 									asChild
 									size="sm"
-									className={cn(isScrolled && "lg:hidden")}
+									className={cn(
+										"bg-[#7699D4] hover:bg-[#5f7fb1] text-white border-transparent",
+										isScrolled && "lg:hidden"
+									)}
 								>
-									<Link href="/generation/brief">
+									<Link href="/register">
 										<span>Lancer B-WORK</span>
 									</Link>
 								</Button>

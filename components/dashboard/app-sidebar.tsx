@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSession } from "@/context/SessionContext";
 import { UserRole } from "@/enums/roles";
+import { Logo } from "../landing/logo";
 
 const navData: NavGroup[] = [
 	{
@@ -52,12 +53,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	return (
 		<Sidebar collapsible={"icon"} {...props}>
-			<SidebarHeader className="flex flex-row gap-3">
+			<SidebarHeader className="flex flex-row gap-3 items-center justify-center">
 				<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
 					<GalleryVerticalEnd className="size-5" />
 				</div>
 				<div className="grid flex-1 items-center text-2xl font-bold leading-tight">
-					<span className="truncate font-medium">B-WORK</span>
+				<Logo className="w-20 h-20"/>
 				</div>
 			</SidebarHeader>
 			<SidebarContent className="overflow-x-hidden">

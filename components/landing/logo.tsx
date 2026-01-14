@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -6,21 +6,20 @@ import Image from "next/image";
 export const Logo = ({ className }: { className?: string }) => {
 	return (
 		<>
-			<span className="text-2xl font-bold">B-WORK</span>
-			{/*<Image
-				src="/images/logo/logo-black-green.png"
-				alt="Gestiloc Logo"
+			<Image
+				src="/logo-black.svg"
+				alt="B WORK Logo"
 				width={130}
 				height={50}
 				className={cn("h-auto w-36 dark:hidden", className)}
 			/>
 			<Image
-				src="/images/logo/logo-white-green.png"
-				alt="Gestiloc Logo"
+				src="/logo-black.svg"
+				alt="B WORK Logo"
 				width={130}
 				height={50}
 				className={cn("h-auto w-36 hidden dark:block", className)}
-			/>*/}
+			/>
 		</>
 	);
 };
@@ -30,12 +29,12 @@ export const LogoIcon = ({ className }: { className?: string }) => {
 		<>
 			{/*<Image
 			src="/images/logo/icon-green.png"
-			alt="Gestiloc Logo"
+			alt="B WORK Logo"
 			width={90}
 			height={90}
 			className={cn("h-auto", className)}
 			/>*/}
-		<span className="text-2xl font-bold">B-WORK</span>
+			<span className="text-2xl font-bold">B-WORK</span>
 		</>
 	);
 };

@@ -1,63 +1,283 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { GenerationPoller } from "@/components/dashboard/generation-poller";
+import { getUserTools } from "@/actions/tools";
+import { getUserGenerations } from "@/actions/generations";
+import {
+	BarChart3,
+	Clock3,
+	FolderGit2,
+	Globe2,
+	Lock,
+	Plus,
+} from "lucide-react";
 
-const shortcuts = [
-	{
-		title: "Créer un nouvel outil",
-		desc: "Lance un brief guidé et génère une preview en quelques minutes.",
-		href: "/generation/brief",
-		action: "Lancer",
-	},
-	{
-		title: "Mes outils",
-		desc: "Consulte et gère les outils générés (bientôt connecté à Supabase).",
-		href: "/dashboard/user",
-		action: "Voir",
-	},
-	{
-		title: "Reprendre un brief",
-		desc: "Rouvre un brief précédent pour itérer rapidement.",
-		href: "/generation",
-		action: "Ouvrir",
-	},
-];
+export default async function DashboardPage() {
+	const [{ user, tools }, gens] = await Promise.all([
+		getUserTools(),
+		getUserGenerations(),
+	]);
 
-export default function DashboardPage() {
+	if (!user) {
+		redirect("/login?next=/dashboard");
+	}
+
+	const totalTools = tools.length;
+	const publicTools = tools.filter((t) => t.is_public).length;
+	const privateTools = totalTools - publicTools;
+	const running = (gens.generations || []).filter(
+		(g) => g.status === "queued" || g.status === "running"
+	);
+	const recentTools = [...tools]
+		.sort((a, b) => {
+			const da = a.created_at ? new Date(a.created_at).getTime() : 0;
+			const db = b.created_at ? new Date(b.created_at).getTime() : 0;
+			return db - da;
+		})
+		.slice(0, 3);
+
+	const formatDescription = (text?: string | null) => {
+		if (!text) return "";
+		let cleaned = text;
+		cleaned = cleaned.replace(/Brief métier:\s*/i, "");
+		cleaned = cleaned.replace(/Détails structurés:[\s\S]*/i, "");
+		cleaned = cleaned.replace(/Attendu:[\s\S]*/i, "");
+		cleaned = cleaned.trim();
+		return cleaned.slice(0, 140);
+	};
+
+	const formatDate = (date?: string | null) => {
+		if (!date) return "";
+		return new Date(date).toLocaleString("fr-FR", {
+			day: "2-digit",
+			month: "short",
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	};
+
 	return (
 		<div className="space-y-8">
-			<div>
-				<p className="text-sm text-muted-foreground">Bienvenue</p>
-				<h1 className="text-2xl font-semibold">Pilotage B-WORK</h1>
-				<p className="text-muted-foreground mt-2 text-sm">
-					Génère des outils internes sans code, partage-les et itère rapidement.
-				</p>
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<p className="text-sm text-muted-foreground">Bienvenue</p>
+					<h1 className="text-3xl font-semibold">B-WORK</h1>
+					<p className="text-muted-foreground mt-2 text-sm">
+						Lance une création, publie un outil ou reprends une génération en
+						cours.
+					</p>
+				</div>
+				<div className="flex flex-wrap gap-2">
+					<Button asChild variant="secondary">
+						<Link
+							href="/dashboard/user/tools-list"
+							className="flex flex-row items-center gap-2 whitespace-nowrap"
+						>
+							<FolderGit2 className="h-4 w-4" />
+							Mes outils
+						</Link>
+					</Button>
+					<Button asChild>
+						<Link
+							href="/generation/brief"
+							className="flex flex-row items-center gap-2 whitespace-nowrap"
+						>
+							<Plus className="h-4 w-4" />
+							Créer un outil
+						</Link>
+					</Button>
+				</div>
 			</div>
 
-			<div className="grid gap-4 md:grid-cols-3">
-				{shortcuts.map((item) => (
-					<div
-						key={item.title}
-						className="flex h-full flex-col justify-between rounded-xl border bg-white p-4 shadow-sm"
-					>
-						<div className="space-y-2">
-							<h3 className="text-lg font-medium">{item.title}</h3>
-							<p className="text-sm text-muted-foreground">{item.desc}</p>
+			{/* Indicateur live des générations */}
+			<GenerationPoller />
+
+			{/* Statistiques clés */}
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+				<div className="rounded-xl border bg-white p-4 shadow-sm">
+					<div className="flex items-center justify-between">
+						<div>
+							<p className="text-xs uppercase text-muted-foreground">
+								Outils au total
+							</p>
+							<p className="text-2xl font-semibold">{totalTools}</p>
 						</div>
-						<div className="mt-4">
-							<Button asChild className="w-full">
-								<Link href={item.href}>{item.action}</Link>
+						<BarChart3 className="h-5 w-5 text-slate-500" />
+					</div>
+				</div>
+				<div className="rounded-xl border bg-white p-4 shadow-sm">
+					<div className="flex items-center justify-between">
+						<div>
+							<p className="text-xs uppercase text-muted-foreground">Publics</p>
+							<p className="text-2xl font-semibold">{publicTools}</p>
+						</div>
+						<Globe2 className="h-5 w-5 text-emerald-600" />
+					</div>
+				</div>
+				<div className="rounded-xl border bg-white p-4 shadow-sm">
+					<div className="flex items-center justify-between">
+						<div>
+							<p className="text-xs uppercase text-muted-foreground">Privés</p>
+							<p className="text-2xl font-semibold">{privateTools}</p>
+						</div>
+						<Lock className="h-5 w-5 text-slate-600" />
+					</div>
+				</div>
+				<div className="rounded-xl border bg-white p-4 shadow-sm">
+					<div className="flex items-center justify-between">
+						<div>
+							<p className="text-xs uppercase text-muted-foreground">
+								Générations actives
+							</p>
+							<p className="text-2xl font-semibold">{running.length}</p>
+						</div>
+						<Clock3 className="h-5 w-5 text-amber-600" />
+					</div>
+				</div>
+			</div>
+
+			{/* Raccourcis */}
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+				<div className="flex h-full flex-col justify-between rounded-xl border bg-white p-4 shadow-sm">
+					<div className="space-y-2">
+						<h3 className="text-lg font-medium">Créer un nouvel outil</h3>
+						<p className="text-sm text-muted-foreground">
+							Lance un brief guidé et génère ta preview en quelques minutes.
+						</p>
+					</div>
+					<Button asChild className="mt-4 w-full">
+						<Link href="/generation/brief">Lancer</Link>
+					</Button>
+				</div>
+				<div className="flex h-full flex-col justify-between rounded-xl border bg-white p-4 shadow-sm">
+					<div className="space-y-2">
+						<h3 className="text-lg font-medium">Mes outils</h3>
+						<p className="text-sm text-muted-foreground">
+							Consulte, partage ou supprime tes outils générés.
+						</p>
+					</div>
+					<Button asChild className="mt-4 w-full" variant="secondary">
+						<Link href="/dashboard/user/tools-list">Voir</Link>
+					</Button>
+				</div>
+			</div>
+
+			{/* Générations en cours */}
+			{running.length > 0 && (
+				<div className="rounded-xl border bg-white p-5 shadow-sm space-y-3">
+					<div className="flex items-center justify-between">
+						<div>
+							<h3 className="text-lg font-semibold">Générations en cours</h3>
+							<p className="text-sm text-muted-foreground">
+								Vous serez notifié dès qu’elles seront prêtes.
+							</p>
+						</div>
+					</div>
+					<div className="space-y-3">
+						{running.map((g) => (
+							<div
+								key={g.id}
+								className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
+							>
+								<div className="space-y-1">
+									<p className="text-sm font-semibold text-slate-900">
+										{g.title || "Génération en arrière-plan"}
+									</p>
+									<p className="text-xs text-slate-600">
+										Statut : {g.status === "queued" ? "En attente" : "En cours"}
+									</p>
+								</div>
+								<Button asChild size="sm" variant="outline">
+									<Link href={`/generation?sandbox=${g.sandbox_id}`}>
+										Ouvrir la génération
+									</Link>
+								</Button>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
+
+			{/* Derniers outils */}
+			<div className="space-y-3">
+				<div className="flex items-center justify-between">
+					<h3 className="text-lg font-semibold">Derniers outils</h3>
+					<Button variant="ghost" asChild size="sm">
+						<Link href="/dashboard/user/tools-list">Voir tout</Link>
+					</Button>
+				</div>
+
+				{totalTools === 0 ? (
+					<div className="rounded-xl border bg-white p-6 text-center shadow-sm">
+						<h4 className="text-lg font-medium">Aucun outil pour le moment</h4>
+						<p className="mt-2 text-sm text-muted-foreground">
+							Lance un brief pour voir tes outils ici.
+						</p>
+						<div className="mt-4 flex justify-center">
+							<Button asChild>
+								<Link href="/generation/brief">Créer un outil</Link>
 							</Button>
 						</div>
 					</div>
-				))}
-			</div>
+				) : (
+					<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+						{recentTools.map((tool) => (
+							<div
+								key={tool.id}
+								className="flex h-full flex-col rounded-xl border bg-white p-4 shadow-sm"
+							>
+								<div className="flex items-start justify-between gap-2">
+									<div>
+										<h4 className="text-base font-semibold line-clamp-1">
+											{tool.title}
+										</h4>
+										<p className="text-xs text-muted-foreground">
+											Créé le {formatDate(tool.created_at)}
+										</p>
+									</div>
+								</div>
 
-			<div className="rounded-xl border bg-white p-4 shadow-sm">
-				<h3 className="text-lg font-medium">Mes outils (bientôt)</h3>
-				<p className="text-sm text-muted-foreground">
-					Connexion Supabase à venir : affichage de la liste des outils et accès
-					rapide aux previews.
-				</p>
+								{tool.description ? (
+									<p className="mt-3 text-sm text-muted-foreground line-clamp-3">
+										{formatDescription(tool.description)}
+									</p>
+								) : (
+									<p className="mt-3 text-sm text-muted-foreground">
+										Pas de description fournie.
+									</p>
+								)}
+
+								<div className="mt-3 flex items-center gap-2">
+									<span
+										className={`rounded-full text-xs px-2 py-1 ${
+											tool.is_public
+												? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+												: "bg-slate-100 text-slate-700"
+										}`}
+									>
+										Visibilité : {tool.is_public ? "Public" : "Privé"}
+									</span>
+								</div>
+
+								<div className="mt-4">
+									<Button
+										asChild
+										variant="outline"
+										size="sm"
+										className="w-full"
+									>
+										<Link
+											href={`/generation?sandbox=${tool.sandbox_url ?? ""}`}
+										>
+											Ouvrir l’outil
+										</Link>
+									</Button>
+								</div>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	);

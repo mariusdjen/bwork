@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    container_name: open-lovable-staging
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    command: pnpm run start
+    # restart: unless-stopped

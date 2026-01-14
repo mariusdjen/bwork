@@ -1,54 +1,75 @@
 "use client";
 
-import * as React from "react";
-import { useState } from "react";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BadgeCheckIcon, Check, Info } from "lucide-react";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-	TooltipProvider,
-} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { Tagline } from "@/components/landing/tagline";
-import { VariantProps } from "class-variance-authority";
-import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import Link from "next/link";
-import { SubscriptionPlanResolved } from "@/types/subscription_plan";
+
+export type PricingPlan = {
+	name: string;
+	price: string;
+	period: string;
+	description: string;
+	features: string[];
+	link: string;
+	highlight: boolean;
+	badge?: string;
+};
+
+const PLANS: PricingPlan[] = [
+	{
+		name: "Starter",
+		price: "0",
+		period: "mois",
+		description: "Pour tester B-WORK et lancer vos premiers outils.",
+		features: [
+			"Générations guidées",
+			"Styles shadcn/Tailwind prêts à l'emploi",
+			"Suivi de génération de base",
+		],
+		link: "/register?plan=starter",
+		highlight: false,
+	},
+	{
+		name: "Pro",
+		price: "29",
+		period: "mois",
+		description: "Pour industrialiser vos apps internes et gagner du temps.",
+		features: [
+			"Générations en arrière-plan + notifications",
+			"Anti-doublons & liens sandbox longs",
+			"Actions outils (partager, supprimer, public/privé)",
+		],
+		link: "/register?plan=pro",
+		highlight: true,
+		badge: "Le plus choisi",
+	},
+	{
+		name: "Entreprise",
+		price: "Sur-mesure",
+		period: "",
+		description: "Pour vos équipes élargies et vos règles métier avancées.",
+		features: [
+			"Workflows dédiés et priorisation",
+			"Intégrations personnalisées",
+			"Support premium & SLA",
+		],
+		link: "/contact",
+		highlight: false,
+	},
+];
 
 export function Pricing({
-	subscriptionPlans,
+	onSelect,
 }: {
-	subscriptionPlans: SubscriptionPlanResolved[];
+	onSelect?: (plan: PricingPlan) => void;
 }) {
-	//variables
-	const [billingPeriod, setBillingPeriod] = useState("monthly");
-	const pricingData = {
-		plans: subscriptionPlans.map((plan) => ({
-			name: plan.name,
-			description: plan.description,
-			badge: plan.badge ? "Le plus populaire" : undefined,
-			features: plan.subscription_features.map((feature) => ({
-				name: feature.name,
-				tooltip: feature.tooltip,
-			})),
-			pricing: {
-				monthly: plan.price.monthly ? Math.round(plan.price.monthly / 100) : 0,
-				annually: plan.price.annually ? Math.round(plan.price.annually / 100) : 0,
-			},
-			variant: plan.variant,
-			highlighted: plan.highlighted,
-			link: `/register?plan=${encodeURIComponent(plan.code)}`,
-		})),
-	};
+	const isSelectable = typeof onSelect === "function";
 
 	return (
 		<section
-			className="bg-background section-padding-y "
+			className="bg-background section-padding-y py-16 md:py-28"
+			id="pricing"
 			aria-labelledby="pricing-section-title"
 		>
 			<div className="container-padding-x container mx-auto">
@@ -59,55 +80,33 @@ export function Pricing({
 							id="pricing-section-title"
 							className="heading-lg text-foreground"
 						>
-							Choisissez le forfait adapté à votre activité
+							Choisissez le forfait adapté à votre équipe
 						</h2>
 						<p className="text-muted-foreground text-base">
-							Des solutions flexibles pour tous les besoins, des petits
-							bailleurs aux agences immobilières. Commencez gratuitement et
-							évoluez à votre rythme.
+							Des offres simples pour démarrer, accélérer ou industrialiser vos
+							générations d’outils internes.
 						</p>
 					</div>
 
-					<Tabs
-						value={billingPeriod}
-						onValueChange={setBillingPeriod}
-						className="w-fit"
-					>
-						<TabsList className="bg-muted h-10 rounded-full p-1">
-							<TabsTrigger
-								value="monthly"
-								className=" rounded-full data-[state=active]:bg-background px-3 py-1.5 data-[state=active]:shadow-sm"
-							>
-								Mensuel
-							</TabsTrigger>
-							<TabsTrigger
-								value="annually"
-								className="rounded-full data-[state=active]:bg-background px-3 py-1.5 data-[state=active]:shadow-sm"
-							>
-								Annuel
-							</TabsTrigger>
-						</TabsList>
-					</Tabs>
-
 					<div className="grid w-full grid-cols-1 gap-4 lg:max-w-5xl lg:grid-cols-3 lg:gap-6">
-						{pricingData.plans.map((plan, index) => (
-							<Card
+						{PLANS.map((plan) => (
+							<div
 								key={plan.name}
-								className={`rounded-xl p-6 lg:p-8 ${
-									plan.highlighted ? "border-brand border-2" : ""
+								className={`rounded-xl p-6 lg:p-8 border bg-card shadow-sm ${
+									plan.highlight ? "border-2 border-[#7699D4]" : "border-border"
 								}`}
 							>
-								<CardContent className="flex flex-col gap-8 p-0">
-									<div className="flex flex-col gap-6">
-										<div className="relative flex flex-col gap-3">
+								<div className="flex flex-col gap-8">
+									<div className="flex flex-col gap-4">
+										<div className="relative flex flex-col gap-2">
 											{plan.badge && (
-												<Badge className="absolute top-1 right-0 w-fit">
+												<span className="absolute top-1 right-0 w-fit rounded-full bg-[#7699D4]/15 px-3 py-1 text-xs font-medium text-[#5f7fb1]">
 													{plan.badge}
-												</Badge>
+												</span>
 											)}
 											<h3
 												className={`text-lg font-semibold ${
-													plan.highlighted ? "text-primary" : ""
+													plan.highlight ? "text-[#7699D4]" : ""
 												}`}
 											>
 												{plan.name}
@@ -117,90 +116,71 @@ export function Pricing({
 											</p>
 										</div>
 
-										<div className="flex items-end gap-0.5">
-											<div className="flex flex-col gap-2">
-												<div className="flex items-end gap-0.5">
-													<span className="text-4xl font-semibold">
-														{billingPeriod === "monthly"
-															? plan.pricing.monthly
-															: plan.pricing.annually}{" "}
-													</span>
-
-													<span className="text-4xl font-semibold">€</span>
-													<span className="text-muted-foreground text-base">
-														/{billingPeriod === "monthly" ? "mois" : "an"}
-													</span>
-												</div>
-
-												{billingPeriod === "annually" &&
-													plan.pricing.annually > 0 && (
-														<motion.div
-															initial={{ opacity: 0, y: -10 }}
-															animate={{ opacity: 1, y: 0 }}
-															transition={{ duration: 0.3, delay: 0.2 }}
-														>
-															<Badge
-																variant="secondary"
-																className="bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400 border-green-200 dark:border-green-800"
-															>
-																<BadgeCheckIcon className="h-3 w-3 mr-1" />
-																Économisez{" "}
-																{plan.pricing.monthly * 12 -
-																	plan.pricing.annually}
-																€
-															</Badge>
-														</motion.div>
-													)}
-											</div>
+										<div className="flex items-end gap-1">
+											<span className="text-4xl font-semibold">
+												{plan.price}
+											</span>
+											{plan.period && (
+												<span className="text-muted-foreground text-base">
+													/{plan.period}
+												</span>
+											)}
 										</div>
+										{plan.highlight && (
+											<span className="w-fit rounded-full bg-[#7699D4]/15 px-2.5 py-1 text-xs font-medium text-[#5f7fb1]">
+												Recommandé
+											</span>
+										)}
 
-										<Link href={plan.link} className="w-full">
+										{isSelectable ? (
 											<Button
-												variant={
-													plan.variant as VariantProps<
-														typeof buttonVariants
-													>["variant"]
-												}
-												className="w-full"
+												className={`w-full ${
+													plan.highlight
+														? "bg-[#7699D4] hover:bg-[#5f7fb1] text-white"
+														: ""
+												}`}
+												onClick={() => onSelect?.(plan)}
 											>
-												{plan.pricing.monthly === 0
+												{plan.price === "0"
 													? "Commencer gratuitement"
+													: plan.price === "Sur-mesure"
+													? "Parler à un expert"
 													: "Choisir ce forfait"}
 											</Button>
-										</Link>
+										) : (
+											<Link href={plan.link} className="w-full">
+												<Button
+													className={`w-full ${
+														plan.highlight
+															? "bg-[#7699D4] hover:bg-[#5f7fb1] text-white"
+															: ""
+													}`}
+												>
+													{plan.price === "0"
+														? "Commencer gratuitement"
+														: plan.price === "Sur-mesure"
+														? "Parler à un expert"
+														: "Choisir ce forfait"}
+												</Button>
+											</Link>
+										)}
 									</div>
 
-									<div className="flex flex-col gap-4">
-										<p className="text-sm font-medium">
-											{index === 0
-												? "Fonctionnalités incluses :"
-												: `Tout ${pricingData.plans[index - 1].name}, plus :`}
-										</p>
-										<div className="flex flex-col gap-4">
+									<div className="flex flex-col gap-3">
+										<p className="text-sm font-medium">Fonctionnalités :</p>
+										<div className="flex flex-col gap-3">
 											{plan.features.map((feature, i) => (
 												<div key={i} className="flex items-center gap-3">
-													<Check className="text-primary h-5 w-5" />
+													<Check className="text-[#7699D4] h-5 w-5" />
 													<span className="text-muted-foreground flex-1 text-sm">
-														{feature.name}
+														{feature}
 													</span>
-													<TooltipProvider>
-														<Tooltip>
-															<TooltipTrigger
-																aria-label={`Plus d'informations sur ${feature.name}`}
-															>
-																<Info className="text-muted-foreground h-4 w-4 cursor-pointer opacity-70 hover:opacity-100" />
-															</TooltipTrigger>
-															<TooltipContent className="max-w-xs">
-																<p>{feature.tooltip}</p>
-															</TooltipContent>
-														</Tooltip>
-													</TooltipProvider>
 												</div>
 											))}
 										</div>
 									</div>
-								</CardContent>
-							</Card>
+								</div>
+							</div>
 						))}
 					</div>
 				</div>

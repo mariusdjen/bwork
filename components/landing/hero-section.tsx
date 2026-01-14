@@ -133,7 +133,7 @@ export default function HeroSection() {
 										<Button
 											asChild
 											size="lg"
-											className="rounded-lg px-5 text-base"
+											className="rounded-lg px-5 text-base bg-[#7699D4] hover:bg-[#5f7fb1] text-white border-transparent"
 										>
 											<Link href="/generation/brief">
 												<span className="text-nowrap">Lancer B-WORK</span>
@@ -147,7 +147,7 @@ export default function HeroSection() {
 										variant="ghost"
 										className="h-11 rounded-lg px-5"
 									>
-										<Link href="/pricing">
+										<Link href="/#pricing">
 											<span className="text-nowrap">Voir les tarifs</span>
 										</Link>
 									</Button>
@@ -172,14 +172,14 @@ export default function HeroSection() {
 								<div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
 									<Image
 										className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-										src="/images/landing/dashboard-dark.svg"
+										src="/hero2.svg"
 										alt="app screen"
 										width="2700"
 										height="1440"
 									/>
 									<Image
 										className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-										src="/images/landing/dashboard-light.webp"
+										src="/hero2.svg"
 										alt="app screen"
 										width="2700"
 										height="1440"
