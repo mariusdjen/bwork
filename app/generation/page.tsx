@@ -428,18 +428,13 @@ function AISandboxPage() {
 			setBriefMode(true);
 			setBriefStatus("Initialisation de la génération...");
 			setBriefPromptText(brief);
-			setIsStartingNewGeneration(true);
 			const run = async () => {
-				try {
-					if (!sandboxData) {
-						await createSandbox(true);
-					}
-					setBriefStatus("Génération en cours...");
-					await sendChatMessage(brief);
-					await registerGenerationStatus("running");
-				} finally {
-					setIsStartingNewGeneration(false);
+				if (!sandboxData) {
+					await createSandbox(true);
 				}
+				setBriefStatus("Génération en cours...");
+				await sendChatMessage(brief);
+				await registerGenerationStatus("running");
 			};
 			run();
 			return;
@@ -1550,6 +1545,15 @@ Tip: I automatically detect and install npm packages from your code imports (lik
 				: generationProgress.isGenerating
 				? generationProgress.status || "Génération en cours..."
 				: briefStatus || "Préparation de ton outil interne...";
+			const hasPreviewLink = Boolean(sandboxData?.url);
+			const isFinalized =
+				!isBusy &&
+				!generationProgress.isGenerating &&
+				!isStartingNewGeneration &&
+				!codeApplicationState.stage &&
+				!loading &&
+				hasPreviewLink &&
+				generationProgress.status === "Generation complete!";
 
 			return (
 				<div className="relative w-full h-full bg-gradient-to-b from-gray-50 via-white to-gray-100">
@@ -1595,7 +1599,7 @@ Tip: I automatically detect and install npm packages from your code imports (lik
 									</button>
 								</div>
 							</>
-						) : (
+						) : isFinalized ? (
 							<>
 								<div className="w-14 h-14 border-4 border-heat-100 border-t-transparent rounded-full" />
 								<div className="text-title-h5 text-accent-black">
@@ -1605,22 +1609,32 @@ Tip: I automatically detect and install npm packages from your code imports (lik
 									Prévisualise et partage avec ton équipe.
 								</div>
 							</>
+						) : (
+							<>
+								<div className="w-14 h-14 border-4 border-heat-100 border-t-transparent rounded-full animate-spin" />
+								<div className="text-title-h5 text-accent-black">
+									Préparation de la preview
+								</div>
+								<div className="text-body-medium text-black-alpha-72 max-w-lg">
+									On prépare l’espace de prévisualisation avant de démarrer.
+								</div>
+							</>
 						)}
-						{!isBusy && sandboxData?.url && (
+						{isFinalized && (
 							<div className="flex flex-wrap items-center justify-center gap-3 text-xs text-accent-black bg-white border border-border-faint rounded-12 px-10 py-8 shadow-sm max-w-xl">
 								<span className="font-medium text-black-alpha-72">
 									Lien de preview :
 								</span>
 								<a
-									href={sandboxData.url}
+									href={sandboxData?.url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="text-heat-100 font-semibold break-all"
 								>
-									{sandboxData.url}
+									{sandboxData?.url}
 								</a>
 								<a
-									href={sandboxData.url}
+									href={sandboxData?.url}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="ml-2 inline-flex items-center gap-2 px-3 py-2 rounded-10 bg-heat-100 text-white text-xs font-semibold hover:bg-heat-90 transition-colors"
