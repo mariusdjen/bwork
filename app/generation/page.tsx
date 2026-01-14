@@ -428,13 +428,18 @@ function AISandboxPage() {
 			setBriefMode(true);
 			setBriefStatus("Initialisation de la génération...");
 			setBriefPromptText(brief);
+			setIsStartingNewGeneration(true);
 			const run = async () => {
-				if (!sandboxData) {
-					await createSandbox(true);
+				try {
+					if (!sandboxData) {
+						await createSandbox(true);
+					}
+					setBriefStatus("Génération en cours...");
+					await sendChatMessage(brief);
+					await registerGenerationStatus("running");
+				} finally {
+					setIsStartingNewGeneration(false);
 				}
-				setBriefStatus("Génération en cours...");
-				await sendChatMessage(brief);
-				await registerGenerationStatus("running");
 			};
 			run();
 			return;

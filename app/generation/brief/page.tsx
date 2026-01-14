@@ -54,6 +54,12 @@ const labelClass = "text-sm font-medium text-slate-900";
 
 export default function BriefPage() {
 	const router = useRouter();
+	const safeRandomId = () => {
+		if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+			return crypto.randomUUID();
+		}
+		return `rule-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+	};
 	const [step, setStep] = useState<"intro" | "questions">("intro");
 	const [intro, setIntro] = useState("");
 	const [questions, setQuestions] = useState<GeneratedQuestion[]>(fallbackQuestions);
@@ -154,7 +160,7 @@ export default function BriefPage() {
 		setAdvancedRules((prev) => [
 			...prev,
 			{
-				id: crypto.randomUUID(),
+				id: safeRandomId(),
 				condition: "",
 				actionTrue: "",
 				actionFalse: "",

@@ -19,10 +19,11 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat \
 	&& addgroup -g 1001 nodejs && adduser -S -G nodejs nextjs
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3001
-# copier le build complet et les dépendances pour next start
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+# copier le build complet et les dépendances pour next start (avec ownership)
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+RUN chown -R nextjs:nodejs /app
 USER nextjs
 EXPOSE 3001
 CMD ["node_modules/.bin/next", "start", "-H", "0.0.0.0", "-p", "3001"]
