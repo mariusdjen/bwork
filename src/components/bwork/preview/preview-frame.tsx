@@ -5,15 +5,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 type PreviewFrameProps = {
   generatedCode: string | null;
+  fullscreen?: boolean;
 };
 
 /**
  * Renders generated tool code inside a sandboxed iframe using srcdoc.
- * The iframe is isolated: no parent DOM access, no navigation, no popups.
+ * The iframe shares the parent origin (allow-same-origin) to enable API proxy calls.
  * React 18 + Tailwind CSS + Babel standalone are loaded via CDN inside the iframe.
+ * External fetch calls are intercepted and routed through /api/tools/proxy.
  * Errors inside the iframe are communicated back via postMessage.
  */
-export function PreviewFrame({ generatedCode }: PreviewFrameProps) {
+export function PreviewFrame({ generatedCode, fullscreen = false }: PreviewFrameProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [iframeError, setIframeError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -49,9 +51,13 @@ export function PreviewFrame({ generatedCode }: PreviewFrameProps) {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
+  const containerHeight = fullscreen
+    ? "h-full"
+    : "h-[400px] md:h-[500px] lg:h-[600px]";
+
   if (!generatedCode) {
     return (
-      <div className="flex h-[300px] w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/50 md:h-[400px] lg:h-[500px]">
+      <div className={`flex ${containerHeight} w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/50`}>
         <p className="text-sm text-muted-foreground">
           Aucun code genere pour cet outil.
         </p>
@@ -62,7 +68,7 @@ export function PreviewFrame({ generatedCode }: PreviewFrameProps) {
   const srcdoc = buildSrcdoc(generatedCode);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-lg border border-border">
+    <div className={`relative w-full overflow-hidden ${fullscreen ? "" : "rounded-lg border border-border"}`}>
       {isLoading && (
         <div className="absolute inset-0 z-10">
           <Skeleton className="h-full w-full rounded-lg" />
@@ -84,10 +90,10 @@ export function PreviewFrame({ generatedCode }: PreviewFrameProps) {
       <iframe
         ref={iframeRef}
         srcDoc={srcdoc}
-        sandbox="allow-scripts allow-forms"
+        sandbox="allow-scripts allow-forms allow-same-origin"
         referrerPolicy="no-referrer"
         title="Preview de l'outil"
-        className="h-[300px] w-full border-0 md:h-[400px] lg:h-[500px]"
+        className={`w-full border-0 ${containerHeight}`}
         onLoad={() => {
           // Fallback: if postMessage hasn't resolved loading yet, stop after 3s
           setTimeout(() => {
@@ -158,6 +164,46 @@ function buildSrcdoc(generatedCode: string): string {
     <p id="bwork-error-detail" style="font-size:0.875rem;color:#6b7280;margin-top:0.5rem;"></p>
   </div>
   <script>
+    // Override fetch to route external API calls through the server proxy.
+    // This bypasses CORS restrictions for generated tools that call third-party APIs.
+    (function() {
+      var originalFetch = window.fetch;
+      window.fetch = function(input, init) {
+        var url = typeof input === "string" ? input : (input instanceof Request ? input.url : String(input));
+        // Only proxy absolute http(s) URLs to external domains
+        try {
+          var parsed = new URL(url, window.location.origin);
+          if ((parsed.protocol === "https:" || parsed.protocol === "http:") && parsed.origin !== window.location.origin) {
+            var method = (init && init.method) || "GET";
+            var headers = {};
+            if (init && init.headers) {
+              if (init.headers instanceof Headers) {
+                init.headers.forEach(function(v, k) { headers[k] = v; });
+              } else if (typeof init.headers === "object") {
+                headers = Object.assign({}, init.headers);
+              }
+            }
+            var body = undefined;
+            if (init && init.body) {
+              if (typeof init.body === "string") { body = init.body; }
+              else if (init.body instanceof URLSearchParams) { body = init.body.toString(); }
+              else if (init.body instanceof FormData) {
+                var obj = {}; init.body.forEach(function(v, k) { obj[k] = v; });
+                body = JSON.stringify(obj);
+              }
+              else { try { body = JSON.stringify(init.body); } catch(e) { body = String(init.body); } }
+            }
+            return originalFetch("/api/tools/proxy", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url: url, method: method, headers: headers, body: body })
+            });
+          }
+        } catch(e) {}
+        return originalFetch(input, init);
+      };
+    })();
+
     // Global error handler — catches Babel transpilation errors and runtime errors
     window.onerror = function(msg, src, line, col, err) {
       var detail = (err && err.message) || String(msg);
