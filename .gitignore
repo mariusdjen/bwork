@@ -1,8 +1,5 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
-**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -20,13 +17,8 @@
 
 # production
 /build
-/dist
-*.tar
-*.tar.gz
-*.tgz
 
 # misc
-.DS_Store
 *.pem
 
 # debug
@@ -35,11 +27,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-.env.local
-.env.production
-!.env.example
+# env files
+.env
+.env*.local
 
 # vercel
 .vercel
@@ -48,17 +38,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# E2B template builds
-*.tar.gz
-e2b-template-*
-
 # IDE
-.vscode/
 .idea/
+.vscode/
+*.swp
+*.swo
 
-# Temporary files
-*.tmp
-*.temp
-repomix-output.txt
-bun.lockb
-.env*.local
+# OS
+.DS_Store
+Thumbs.db
+
+# old project
+/oldprojet
