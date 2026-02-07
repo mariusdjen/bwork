@@ -1,0 +1,8 @@
+export const MAX_GENERATIONS_PER_DAY = 10;
+export const SANDBOX_TIMEOUT_MS = 60_000;
+export const ARTIFACT_DEBOUNCE_MS = 500;
+export const TOAST_DURATION_MS = 4_000;
+export const TOAST_GENERATION_DURATION_MS = 6_000;
+export const MAX_ENTITIES_PER_ARTIFACT = 10;
+export const MAX_FIELDS_PER_ENTITY = 20;
+export const MAX_RULES_PER_ARTIFACT = 20;

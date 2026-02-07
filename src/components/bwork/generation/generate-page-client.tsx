@@ -17,11 +17,14 @@ type GeneratePageClientProps = {
  * Polls the tool status until it becomes "active" (code saved to DB).
  * This avoids the race condition where onFinish hasn't completed yet
  * when the client finishes consuming the stream.
+ *
+ * Default timeout: 2 minutes (120 attempts * 1000ms)
+ * The sandbox pipeline can take 1-2 minutes to complete.
  */
 async function waitForToolActive(
   toolId: string,
-  maxAttempts = 20,
-  intervalMs = 500,
+  maxAttempts = 120,
+  intervalMs = 1000,
 ): Promise<boolean> {
   for (let i = 0; i < maxAttempts; i++) {
     try {
